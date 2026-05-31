@@ -240,9 +240,7 @@
               {:else if f.icon === 'bolt'}
                 <svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z" /></svg>
               {:else if f.icon === 'lang'}
-                <svg viewBox="0 0 24 24"
-                  ><path d="m8 7-4 5 4 5M16 7l4 5-4 5M13.5 5l-3 14" /></svg
-                >
+                <svg viewBox="0 0 24 24"><path d="m8 7-4 5 4 5M16 7l4 5-4 5M13.5 5l-3 14" /></svg>
               {:else}
                 <svg viewBox="0 0 24 24"><path d="m5 8 4 4-4 4M12 16h7" /></svg>
               {/if}
@@ -304,14 +302,14 @@
           <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
           <span class="term-title">glyphtrail</span>
         </div>
-        <pre class="term-body"><code><span class="c-prompt">$</span> <span class="c-cmd"
-              >glyphtrail</span
-            > analyze .
+        <pre class="term-body"><code
+            ><span class="c-prompt">$</span> <span class="c-cmd">glyphtrail</span> analyze .
 <span class="c-dim">  parsed 412 files · 6,840 symbols · 11,209 edges</span>
 <span class="c-ok">  ✓ graph ready in 1.8s</span>
 
-<span class="c-prompt">$</span> <span class="c-cmd">glyphtrail</span> impact <span
-              class="c-arg">TokenStore</span>
+<span class="c-prompt">$</span> <span class="c-cmd">glyphtrail</span> impact <span class="c-arg"
+              >TokenStore</span
+            >
 <span class="c-key">callers</span>      3   auth::login, auth::refresh, mw::guard
 <span class="c-key">implements</span>   1   trait SessionBacking
 <span class="c-key">dependents</span>   2   crate::api, crate::worker

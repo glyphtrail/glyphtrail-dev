@@ -37,4 +37,3 @@ yarn preview
 ## Deployment
 
 The site is automatically deployed to [GitHub Pages](https://pages.github.com/) on every push to `main` via the [deploy workflow](.github/workflows/deploy.yml). The custom domain `glyphtrail.dev` is configured via [`static/CNAME`](static/CNAME).
-
