@@ -1,0 +1,78 @@
+version: '3'
+
+vars:
+  RUN: "yarn"   # yarn 4 via corepack — not npm, not pnpm
+
+tasks:
+  default:
+    cmds:
+      - task --list --sort=none
+    silent: true
+
+  install:
+    desc: Install dependencies (enables corepack, runs yarn install)
+    preconditions:
+      - sh: command -v corepack
+        msg: "corepack not found — install Node.js 18+ (corepack ships with it)"
+    cmds:
+      - corepack enable
+      - '{{.RUN}} install --immutable'
+
+  dev:
+    desc: Start Vite dev server
+    deps: [_check_yarn]
+    cmds:
+      - '{{.RUN}} dev {{.CLI_ARGS}}'
+
+  build:
+    desc: Build static site for production
+    deps: [_check_yarn]
+    sources:
+      - src/**/*
+      - static/**/*
+      - svelte.config.js
+      - vite.config.ts
+      - package.json
+      - yarn.lock
+    generates:
+      - build/**/*
+    cmds:
+      - '{{.RUN}} build'
+
+  preview:
+    desc: Preview the production build locally
+    deps: [_check_yarn]
+    cmds:
+      - '{{.RUN}} preview {{.CLI_ARGS}}'
+
+  check:
+    desc: Type-check with svelte-check (syncs SvelteKit first)
+    deps: [_check_yarn]
+    cmds:
+      - '{{.RUN}} check'
+
+  check:watch:
+    desc: Type-check in watch mode
+    deps: [_check_yarn]
+    cmds:
+      - '{{.RUN}} check:watch'
+
+  ci:
+    desc: Full CI sequence (check + build)
+    cmds:
+      - task: check
+      - task: build
+
+  clean:
+    desc: Remove build output and SvelteKit cache
+    status:
+      - test ! -d build
+      - test ! -d .svelte-kit
+    cmds:
+      - rm -rf build .svelte-kit
+
+  _check_yarn:
+    internal: true
+    preconditions:
+      - sh: command -v yarn
+        msg: "yarn not found — install Node.js 18+ and run: corepack enable"
