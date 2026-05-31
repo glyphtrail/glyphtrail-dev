@@ -361,7 +361,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sveltejs/adapter-static@npm:^3.0.8":
+"@sveltejs/adapter-static@npm:^3.0.10":
   version: 3.0.10
   resolution: "@sveltejs/adapter-static@npm:3.0.10"
   peerDependencies:
@@ -370,7 +370,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sveltejs/kit@npm:^2.57.0":
+"@sveltejs/kit@npm:^2.61.1":
   version: 2.61.1
   resolution: "@sveltejs/kit@npm:2.61.1"
   dependencies:
@@ -403,7 +403,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sveltejs/vite-plugin-svelte@npm:^7.0.0":
+"@sveltejs/vite-plugin-svelte@npm:^7.1.2":
   version: 7.1.2
   resolution: "@sveltejs/vite-plugin-svelte@npm:7.1.2"
   dependencies:
@@ -1089,20 +1089,20 @@ __metadata:
   resolution: "glyphtrail-dev@workspace:."
   dependencies:
     "@eslint/js": "npm:^10.0.1"
-    "@sveltejs/adapter-static": "npm:^3.0.8"
-    "@sveltejs/kit": "npm:^2.57.0"
-    "@sveltejs/vite-plugin-svelte": "npm:^7.0.0"
+    "@sveltejs/adapter-static": "npm:^3.0.10"
+    "@sveltejs/kit": "npm:^2.61.1"
+    "@sveltejs/vite-plugin-svelte": "npm:^7.1.2"
     eslint: "npm:^10.4.1"
     eslint-config-prettier: "npm:^10.1.8"
     eslint-plugin-svelte: "npm:^3.19.0"
     globals: "npm:^17.6.0"
     prettier: "npm:^3.8.3"
     prettier-plugin-svelte: "npm:^4.0.1"
-    svelte: "npm:^5.55.2"
-    svelte-check: "npm:^4.4.6"
-    typescript: "npm:^6.0.2"
+    svelte: "npm:^5.56.0"
+    svelte-check: "npm:^4.4.8"
+    typescript: "npm:^6.0.3"
     typescript-eslint: "npm:^8.60.0"
-    vite: "npm:^8.0.7"
+    vite: "npm:^8.0.14"
   languageName: unknown
   linkType: soft
 
@@ -1760,7 +1760,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"svelte-check@npm:^4.4.6":
+"svelte-check@npm:^4.4.8":
   version: 4.4.8
   resolution: "svelte-check@npm:4.4.8"
   dependencies:
@@ -1798,7 +1798,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"svelte@npm:^5.55.2":
+"svelte@npm:^5.56.0":
   version: 5.56.0
   resolution: "svelte@npm:5.56.0"
   dependencies:
@@ -1892,7 +1892,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:^6.0.2":
+"typescript@npm:^6.0.3":
   version: 6.0.3
   resolution: "typescript@npm:6.0.3"
   bin:
@@ -1902,7 +1902,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@npm%3A^6.0.2#optional!builtin<compat/typescript>":
+"typescript@patch:typescript@npm%3A^6.0.3#optional!builtin<compat/typescript>":
   version: 6.0.3
   resolution: "typescript@patch:typescript@npm%3A6.0.3#optional!builtin<compat/typescript>::version=6.0.3&hash=5786d5"
   bin:
@@ -1935,7 +1935,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vite@npm:^8.0.7":
+"vite@npm:^8.0.14":
   version: 8.0.14
   resolution: "vite@npm:8.0.14"
   dependencies:
