@@ -1,0 +1,13 @@
+# Package manager / deps
+node_modules
+.yarn
+yarn.lock
+.pnp.*
+
+# Build output
+build
+.svelte-kit
+.output
+
+# Tooling caches
+.task

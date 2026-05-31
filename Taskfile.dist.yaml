@@ -1,7 +1,7 @@
 version: '3'
 
 vars:
-  RUN: "yarn"   # yarn 4 via corepack — not npm, not pnpm
+  RUN: 'yarn' # yarn 4 via corepack — not npm, not pnpm
 
 tasks:
   default:
@@ -13,7 +13,7 @@ tasks:
     desc: Install dependencies (enables corepack, runs yarn install)
     preconditions:
       - sh: command -v corepack
-        msg: "corepack not found — install Node.js 18+ (corepack ships with it)"
+        msg: 'corepack not found — install Node.js 18+ (corepack ships with it)'
     cmds:
       - corepack enable
       - '{{.RUN}} install --immutable'
@@ -57,9 +57,42 @@ tasks:
     cmds:
       - '{{.RUN}} check:watch'
 
-  ci:
-    desc: Full CI sequence (check + build)
+  fmt:
+    desc: Format all files with Prettier
+    aliases: [format]
+    deps: [_check_yarn]
     cmds:
+      - '{{.RUN}} format'
+
+  fmt:check:
+    desc: Check formatting without writing (CI-friendly)
+    deps: [_check_yarn]
+    cmds:
+      - '{{.RUN}} format:check'
+
+  lint:
+    desc: Check formatting and run ESLint
+    deps: [_check_yarn]
+    cmds:
+      - '{{.RUN}} lint'
+
+  lint:fix:
+    desc: Auto-fix ESLint problems
+    deps: [_check_yarn]
+    cmds:
+      - '{{.RUN}} lint:fix'
+
+  upgrade:
+    desc: Interactively upgrade dependencies (Yarn)
+    aliases: [up]
+    deps: [_check_yarn]
+    cmds:
+      - '{{.RUN}} up -i "*"'
+
+  ci:
+    desc: Full CI sequence (lint + check + build)
+    cmds:
+      - task: lint
       - task: check
       - task: build
 
@@ -75,4 +108,4 @@ tasks:
     internal: true
     preconditions:
       - sh: command -v yarn
-        msg: "yarn not found — install Node.js 18+ and run: corepack enable"
+        msg: 'yarn not found — install Node.js 18+ and run: corepack enable'
