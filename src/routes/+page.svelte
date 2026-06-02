@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import GraphField from '$lib/components/GraphField.svelte';
   import type { PageData } from './$types';
 
@@ -98,6 +99,199 @@
     { name: 'endpoints', d: 'The API and route surface of the codebase' },
     { name: 'list_repos', d: 'The registry powering cross-repo impact' }
   ];
+
+  // Relative importance / recognizability of each coding agent. Names are
+  // sampled weighted by these values, so better-known agents show up more often.
+  const codingAgentImportance: Record<string, number> = {
+    // Very common / highly recognizable
+    copilot: 1.0,
+    claude: 0.98,
+    codex: 0.95,
+    cursor: 0.92,
+    windsurf: 0.88,
+    gemini: 0.84,
+    aider: 0.78,
+    opencode: 0.76,
+
+    // Strong current relevance
+    cline: 0.74,
+    roo: 0.7,
+    continue: 0.68,
+    cody: 0.66,
+    tabnine: 0.64,
+    'amazon-q': 0.64,
+    goose: 0.62,
+    devin: 0.62,
+    jules: 0.58,
+    replit: 0.56,
+    zed: 0.54,
+    junie: 0.54,
+    kiro: 0.52,
+    kilo: 0.52,
+    antigravity: 0.52,
+
+    // Relevant, but more niche
+    qwen: 0.48,
+    amp: 0.48,
+    codeium: 0.48,
+    supermaven: 0.46,
+    'swe-agent': 0.46,
+    openhands: 0.46,
+    crush: 0.44,
+    pi: 0.42,
+    trae: 0.42,
+    marscode: 0.4,
+    factory: 0.4,
+    bolt: 0.4,
+    lovable: 0.38,
+    v0: 0.38,
+    same: 0.34,
+    manus: 0.34,
+
+    // Review / PR / repo assistants
+    coderabbit: 0.5,
+    qodo: 0.46,
+    sourcery: 0.38,
+    sonar: 0.38,
+    snyk: 0.36,
+    semgrep: 0.34,
+    codecov: 0.34,
+    graphite: 0.32,
+    reviewpad: 0.3,
+    greptile: 0.3,
+    ellipsis: 0.28,
+    dosu: 0.28,
+    codegen: 0.28,
+    potpie: 0.26,
+    entelligence: 0.24,
+
+    // Older / adjacent / lower-confidence
+    codewhisperer: 0.36,
+    ghostwriter: 0.34,
+    watsonx: 0.3,
+    blackbox: 0.28,
+    askcodi: 0.26,
+    phind: 0.26,
+    sourcegraph: 0.24,
+    bito: 0.22,
+    mutable: 0.22,
+    cosine: 0.22,
+    fine: 0.22,
+    poolside: 0.22,
+    magic: 0.22,
+    bloop: 0.2,
+    intellicode: 0.18,
+    kite: 0.08,
+    deepcode: 0.08
+  };
+
+  const agentNames = Object.keys(codingAgentImportance);
+  // Bias sampling toward the better-known agents: the pick probability scales
+  // with importance raised to this power, so high-importance names show up
+  // markedly more often than their raw values alone would give.
+  const AGENT_EMPHASIS = 2.2;
+  const agentWeights = new Map(
+    agentNames.map((name) => [name, codingAgentImportance[name] ** AGENT_EMPHASIS])
+  );
+  const totalAgentWeight = agentNames.reduce((sum, name) => sum + (agentWeights.get(name) ?? 0), 0);
+
+  // Weighted random pick, avoiding an immediate repeat of `previous`.
+  function pickAgent(previous?: string): string {
+    for (let attempt = 0; attempt < 8; attempt += 1) {
+      let r = Math.random() * totalAgentWeight;
+      for (const name of agentNames) {
+        r -= agentWeights.get(name) ?? 0;
+        if (r <= 0) {
+          if (name !== previous) {
+            return name;
+          }
+          break;
+        }
+      }
+    }
+    return agentNames[Math.floor(Math.random() * agentNames.length)];
+  }
+
+  const IDLE_WORD = 'agents';
+
+  // How long the headline rests on "agents" between cycles. The very first
+  // rest is shorter so the animation gets going sooner.
+  const FIRST_REST_MS = 5000;
+  const REST_MS = 6500;
+  // Number of real agent names shown per cycle before settling on "agents".
+  const AGENTS_PER_CYCLE = 3;
+
+  let animatedAgent = $state(IDLE_WORD);
+  // The blinking caret is shown for the whole JS-driven animation (including
+  // the "agents" rest), but never without JS.
+  let showCaret = $state(false);
+  // Real agent names take the caret's muted colour; the "agents" word keeps the
+  // standard white so it reads as part of the "Stop letting agents" headline.
+  let highlightAgent = $state(false);
+
+  onMount(() => {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const after = (fn: () => void, ms: number) => {
+      timer = setTimeout(fn, ms);
+    };
+
+    const eraseDelay = () => Math.floor(38 + Math.random() * 45);
+    const typeDelay = () => {
+      const base = 60 + Math.random() * 110;
+      const hesitation = Math.random() < 0.08 ? 90 + Math.random() * 70 : 0;
+      return Math.floor(base + hesitation);
+    };
+
+    // Char-level primitives. Both assume `animatedAgent` is a prefix of the
+    // target, which holds because every word is erased to '' before the next.
+    const eraseAll = (done: () => void) => {
+      if (animatedAgent.length === 0) {
+        done();
+        return;
+      }
+      animatedAgent = animatedAgent.slice(0, -1);
+      after(() => eraseAll(done), eraseDelay());
+    };
+    const typeWord = (word: string, done: () => void) => {
+      if (animatedAgent.length >= word.length) {
+        done();
+        return;
+      }
+      animatedAgent = word.slice(0, animatedAgent.length + 1);
+      after(() => typeWord(word, done), typeDelay());
+    };
+
+    // Erase/type/erase through random agents for ~5s, then settle back to
+    // "agents" and rest there before looping.
+    const startCycle = () => {
+      eraseAll(() => cycleWord(IDLE_WORD, 0));
+    };
+    const cycleWord = (previous: string, shown: number) => {
+      // After naming AGENTS_PER_CYCLE agents, type back to "agents" (white) and rest.
+      if (shown >= AGENTS_PER_CYCLE) {
+        highlightAgent = false;
+        typeWord(IDLE_WORD, () => after(startCycle, REST_MS));
+        return;
+      }
+      const next = pickAgent(previous);
+      highlightAgent = true;
+      typeWord(next, () => {
+        // Linger on the finished name so it reads, then erase and continue.
+        after(() => eraseAll(() => cycleWord(next, shown + 1)), 2300);
+      });
+    };
+
+    // Open on "agents" with the caret, then start cycling after the first rest.
+    animatedAgent = IDLE_WORD;
+    showCaret = true;
+    after(startCycle, FIRST_REST_MS);
+
+    return () => {
+      if (timer) {
+        clearTimeout(timer);
+      }
+    };
+  });
 </script>
 
 <svelte:head>
@@ -160,7 +354,13 @@
     <div class="container hero-inner">
       <span class="eyebrow">Code intelligence for AI coding agents</span>
       <h1 class="hero-title">
-        Stop letting agents<br />
+        Stop letting <span
+          class="hero-agent"
+          class:is-caret={showCaret}
+          class:is-name={highlightAgent}
+          title="your coding agent of choice"
+          aria-label="your coding agent of choice">{animatedAgent}</span
+        ><br />
         <span class="gradient-text">guess from grep.</span>
       </h1>
       <p class="hero-sub">
@@ -537,6 +737,26 @@
     margin-top: 20px;
     font-size: clamp(2.5rem, 7vw, 4.6rem);
     font-weight: 800;
+  }
+  .hero-agent {
+    /* Sized to its content so the centered headline recenters as names type. */
+    display: inline-block;
+    white-space: nowrap;
+  }
+  .hero-agent.is-name {
+    /* Real agent names share the caret's muted colour. */
+    color: var(--faint);
+  }
+  .hero-agent.is-caret::after {
+    content: '_';
+    margin-left: 0.08em;
+    color: var(--faint);
+    animation: caret-blink 1s steps(1, end) infinite;
+  }
+  @keyframes caret-blink {
+    50% {
+      opacity: 0;
+    }
   }
   .hero-sub {
     margin-top: 22px;
