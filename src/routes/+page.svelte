@@ -1,7 +1,7 @@
 <script lang="ts">
   import GraphField from '$lib/components/GraphField.svelte';
 
-  const GITHUB = 'https://github.com/sunsided/glyphtrail';
+  const GITHUB = 'https://github.com/glyphtrail/glyphtrail';
 
   // Reveal-on-scroll action.
   function reveal(node: HTMLElement, delay = 0) {
@@ -28,7 +28,7 @@
   const features = [
     {
       title: 'Typed symbol graph',
-      body: 'Functions, methods, structs, classes and traits with their calls, imports, inheritance and implements edges - one navigable graph.',
+      body: 'A code knowledge graph of functions, methods, structs, classes and traits with call graph and dependency graph edges in one navigable view.',
       icon: 'graph'
     },
     {
@@ -43,7 +43,7 @@
     },
     {
       title: 'Query in Cypher',
-      body: 'Backed by a native graph database. Find definitions, callers, callees, neighbours and full-text matches with real graph traversal.',
+      body: 'Structural code search over a native graph database. Find definitions, callers, callees, neighbors and semantic relationships with graph traversal.',
       icon: 'search'
     },
     {
@@ -52,18 +52,18 @@
       icon: 'shield'
     },
     {
-      title: 'MCP server built in',
-      body: 'Expose the graph to Claude and any MCP client as first-class tools. Agents query structure instead of guessing from grep.',
+      title: 'MCP server for code intelligence',
+      body: 'Expose the graph to Claude Code and any MCP client as first-class tools. Agents query structure instead of guessing from grep.',
       icon: 'plug'
     },
     {
-      title: 'Incremental & Rust-fast',
-      body: 'Native Rust, no runtime. Re-analyze only the files that changed and query the graph in milliseconds.',
+      title: 'Local-first code intelligence',
+      body: 'Native Rust, no runtime. Re-analyze only changed files and query your local graph in milliseconds.',
       icon: 'bolt'
     },
     {
-      title: 'Multi-language',
-      body: 'Rust, Python, JS, TS/TSX, Go, Java, C, C++, C#, Ruby and Kotlin, parsed with Tree-sitter - one query surface across the stack.',
+      title: 'Tree-sitter static analysis',
+      body: 'Rust, Python, JS, TS/TSX, Go, Java, C, C++, C#, Ruby and Kotlin parsed with Tree-sitter based static analysis on one query surface.',
       icon: 'lang'
     }
   ];
@@ -79,7 +79,10 @@
   ];
 
   const tools = [
-    { name: 'query', d: 'Graph lookups: def, callers, callees, neighbours, search' },
+    {
+      name: 'query',
+      d: 'Graph lookups and structural code search: def, callers, callees, neighbors'
+    },
     { name: 'impact', d: 'Blast radius for a symbol, file or diff - across repos' },
     { name: 'endpoints', d: 'The API and route surface of the codebase' },
     { name: 'list_repos', d: 'The registry powering cross-repo impact' }
@@ -136,15 +139,16 @@
     <div class="hero-glow" aria-hidden="true"></div>
 
     <div class="container hero-inner">
-      <span class="eyebrow">Code intelligence for agents</span>
+      <span class="eyebrow">Code intelligence for AI coding agents</span>
       <h1 class="hero-title">
         Stop letting agents<br />
         <span class="gradient-text">guess from grep.</span>
       </h1>
       <p class="hero-sub">
-        glyphtrail indexes your codebase into a queryable graph, then hands coding agents exact
-        answers: who calls this, what depends on it, and the blast radius of changing it - even
-        across repositories. All local, over CLI and MCP.
+        glyphtrail builds a local-first code intelligence graph from Tree-sitter based static
+        analysis, then gives coding agents exact answers: structural code search, call graph and
+        dependency graph traversal, and blast radius / impact analysis across repositories via CLI
+        and MCP.
       </p>
 
       <div class="hero-cta">
@@ -260,8 +264,8 @@
         <span class="eyebrow">How it works</span>
         <h2>From source files to queryable graph</h2>
         <p class="section-lead">
-          A seven-stage pipeline turns a repository into a graph and vector store you can ask
-          questions of. Re-runs are incremental.
+          A seven-stage pipeline turns a repository into a code graph and vector store for GraphRAG
+          over codebases. Re-runs are incremental.
         </p>
       </div>
 
@@ -329,8 +333,9 @@
         <span class="eyebrow">MCP integration</span>
         <h2>Tools your agent can actually call</h2>
         <p class="section-lead">
-          Start the MCP server and the graph becomes a toolset. Claude and other MCP clients query
-          structure directly - no copy-pasting code into context.
+          Start the MCP server and the graph becomes a code intelligence toolset. Claude Code,
+          Cursor, Windsurf, Codex and other MCP clients query structure directly - no copy-pasting
+          code into context.
         </p>
       </div>
 
@@ -369,7 +374,10 @@
   <div class="container footer-inner">
     <div class="footer-brand">
       <span class="brand-name">glyphtrail</span>
-      <p class="footer-tag">Dependency search and blast-radius analysis for coding agents.</p>
+      <p class="footer-tag">
+        Local code intelligence graph for AI coding agents: Tree-sitter static analysis, structural
+        code search, dependency impact, blast-radius analysis, CLI and MCP server.
+      </p>
       <p class="footer-note">
         Early development - evolving fast. Formerly developed as <code>codegraph</code>.
       </p>
