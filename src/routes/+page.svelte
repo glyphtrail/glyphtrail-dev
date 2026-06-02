@@ -101,6 +101,7 @@
 </script>
 
 <svelte:head>
+  <link rel="canonical" href="https://glyphtrail.dev/" />
   {#if lastUpdatedIso}
     <meta name="last-modified" content={lastUpdatedIso} />
     <meta property="article:modified_time" content={lastUpdatedIso} />
