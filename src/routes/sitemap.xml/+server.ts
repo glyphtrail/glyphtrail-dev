@@ -1,4 +1,5 @@
 import type { RequestHandler } from './$types';
+import { buildDateIso } from '$lib/server/build-metadata';
 
 const SITE = 'https://glyphtrail.dev';
 
@@ -8,13 +9,11 @@ const paths = ['/'];
 export const prerender = true;
 
 export const GET: RequestHandler = () => {
-  const lastmod = new Date().toISOString().slice(0, 10);
-
   const urls = paths
     .map(
       (path) => `  <url>
     <loc>${SITE}${path}</loc>
-    <lastmod>${lastmod}</lastmod>
+    <lastmod>${buildDateIso}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>${path === '/' ? '1.0' : '0.7'}</priority>
   </url>`
