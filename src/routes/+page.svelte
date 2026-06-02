@@ -1,7 +1,7 @@
 <script lang="ts">
   import GraphField from '$lib/components/GraphField.svelte';
 
-  const GITHUB = 'https://github.com/glyphtrail/glyphtrail/';
+  const GITHUB = 'https://github.com/glyphtrail/glyphtrail';
 
   // Reveal-on-scroll action.
   function reveal(node: HTMLElement, delay = 0) {
@@ -79,7 +79,10 @@
   ];
 
   const tools = [
-    { name: 'query', d: 'Graph lookups and structural code search: def, callers, callees, neighbours' },
+    {
+      name: 'query',
+      d: 'Graph lookups and structural code search: def, callers, callees, neighbours'
+    },
     { name: 'impact', d: 'Blast radius for a symbol, file or diff - across repos' },
     { name: 'endpoints', d: 'The API and route surface of the codebase' },
     { name: 'list_repos', d: 'The registry powering cross-repo impact' }
@@ -372,8 +375,8 @@
     <div class="footer-brand">
       <span class="brand-name">glyphtrail</span>
       <p class="footer-tag">
-        Local code intelligence graph for AI coding agents: Tree-sitter static analysis,
-        structural code search, dependency impact, blast-radius analysis, CLI and MCP server.
+        Local code intelligence graph for AI coding agents: Tree-sitter static analysis, structural
+        code search, dependency impact, blast-radius analysis, CLI and MCP server.
       </p>
       <p class="footer-note">
         Early development - evolving fast. Formerly developed as <code>codegraph</code>.
