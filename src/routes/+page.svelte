@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import GraphField from '$lib/components/GraphField.svelte';
   import type { PageData } from './$types';
 
@@ -98,6 +99,68 @@
     { name: 'endpoints', d: 'The API and route surface of the codebase' },
     { name: 'list_repos', d: 'The registry powering cross-repo impact' }
   ];
+
+  const codingAgents = [
+    'claude',
+    'codex',
+    'copilot',
+    'opencode',
+    'kilo',
+    'cursor',
+    'aider',
+    'gemini',
+    'cody',
+    'tabnine',
+    'continue',
+    'windsurf'
+  ];
+
+  let animatedAgent = $state('agents');
+
+  onMount(() => {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let currentAgent = 0;
+    let currentLength = 0;
+    let erasing = false;
+
+    animatedAgent = '';
+
+    const nextStep = () => {
+      const agent = codingAgents[currentAgent];
+
+      if (erasing) {
+        if (currentLength > 0) {
+          currentLength -= 1;
+          animatedAgent = agent.slice(0, currentLength);
+          timer = setTimeout(nextStep, 45);
+          return;
+        }
+
+        erasing = false;
+        currentAgent = (currentAgent + 1) % codingAgents.length;
+        timer = setTimeout(nextStep, 130);
+        return;
+      }
+
+      if (currentLength < agent.length) {
+        currentLength += 1;
+        animatedAgent = agent.slice(0, currentLength);
+        timer = setTimeout(nextStep, 75);
+        return;
+      }
+
+      erasing = true;
+      timer = setTimeout(nextStep, 420);
+    };
+
+    timer = setTimeout(nextStep, 120);
+
+    return () => {
+      if (timer) {
+        clearTimeout(timer);
+      }
+    };
+  });
 </script>
 
 <svelte:head>
@@ -159,7 +222,7 @@
     <div class="container hero-inner">
       <span class="eyebrow">Code intelligence for AI coding agents</span>
       <h1 class="hero-title">
-        Stop letting agents<br />
+        Stop letting <span class="hero-agent">{animatedAgent}</span><br />
         <span class="gradient-text">guess from grep.</span>
       </h1>
       <p class="hero-sub">
@@ -536,6 +599,22 @@
     margin-top: 20px;
     font-size: clamp(2.5rem, 7vw, 4.6rem);
     font-weight: 800;
+  }
+  .hero-agent {
+    display: inline-block;
+    min-width: 8ch;
+    text-align: left;
+  }
+  .hero-agent::after {
+    content: '_';
+    margin-left: 0.08em;
+    color: var(--faint);
+    animation: caret-blink 1s steps(1, end) infinite;
+  }
+  @keyframes caret-blink {
+    50% {
+      opacity: 0;
+    }
   }
   .hero-sub {
     margin-top: 22px;
