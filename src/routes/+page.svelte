@@ -1,7 +1,15 @@
 <script lang="ts">
   import GraphField from '$lib/components/GraphField.svelte';
+  import type { PageData } from './$types';
 
   const GITHUB = 'https://github.com/glyphtrail/glyphtrail';
+  let { data }: { data: PageData } = $props();
+  const lastUpdatedLabel = new Date(data.lastUpdated).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    timeZone: 'UTC'
+  });
 
   // Reveal-on-scroll action.
   function reveal(node: HTMLElement, delay = 0) {
@@ -163,6 +171,7 @@
         <li>Rust-native</li>
         <li>Graph-powered</li>
         <li>MCP-native</li>
+        <li>Last updated {lastUpdatedLabel}</li>
       </ul>
     </div>
   </section>
