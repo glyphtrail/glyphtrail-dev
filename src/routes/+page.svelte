@@ -100,151 +100,156 @@
     { name: 'list_repos', d: 'The registry powering cross-repo impact' }
   ];
 
-  const codingAgents = [
-    // Major agentic CLIs / terminal agents
-    'claude',
-    'claude-code',
-    'codex',
-    'codex-cli',
-    'gemini',
-    'gemini-cli',
-    'antigravity',
-    'opencode',
-    'aider',
-    'goose',
-    'cline',
-    'roo-code',
-    'crush',
-    'pi',
-    'swe-agent',
-    'openhands',
-    'devin',
-    'jules',
-    'factory',
-    'factory-droid',
-    'qwen-code',
-    'amp',
-    'sourcegraph-amp',
+  // Relative importance / recognizability of each coding agent. Names are
+  // sampled weighted by these values, so better-known agents show up more often.
+  const codingAgentImportance: Record<string, number> = {
+    // Very common / highly recognizable
+    copilot: 1.0,
+    claude: 0.98,
+    codex: 0.95,
+    cursor: 0.92,
+    windsurf: 0.88,
+    gemini: 0.84,
+    aider: 0.78,
+    opencode: 0.76,
 
-    // IDE/editor agents and assistants
-    'copilot',
-    'github-copilot',
-    'cursor',
-    'windsurf',
-    'cascade',
-    'continue',
-    'tabnine',
-    'cody',
-    'sourcegraph-cody',
-    'zed',
-    'jetbrains-ai',
-    'replit',
-    'replit-ghostwriter',
-    'amazon-q',
-    'amazon-q-developer',
-    'codeium',
-    'supermaven',
-    'kilo',
-    'kilo-code',
-    'kiro',
-    'trae',
-    'marscode',
+    // Strong current relevance
+    cline: 0.74,
+    roo: 0.7,
+    continue: 0.68,
+    cody: 0.66,
+    tabnine: 0.64,
+    'amazon-q': 0.64,
+    goose: 0.62,
+    devin: 0.62,
+    jules: 0.58,
+    replit: 0.56,
+    zed: 0.54,
+    junie: 0.54,
+    kiro: 0.52,
+    kilo: 0.52,
+    antigravity: 0.52,
 
-    // Cloud / autonomous software engineering agents
-    'devin-ai',
-    'cognition-devin',
-    'jules-google',
-    'sweep',
-    'sweep-ai',
-    'bloop',
-    'mutable',
-    'cosine',
-    'fine',
-    'greptile',
-    'codegen',
-    'ellipsis',
-    'dosu',
-    'potpie',
-    'entelligence',
-    'poolside',
-    'magic',
-    'lovable',
-    'bolt',
-    'bolt-new',
-    'v0',
-    'same',
-    'manus',
+    // Relevant, but more niche
+    qwen: 0.48,
+    amp: 0.48,
+    codeium: 0.48,
+    supermaven: 0.46,
+    'swe-agent': 0.46,
+    openhands: 0.46,
+    crush: 0.44,
+    pi: 0.42,
+    trae: 0.42,
+    marscode: 0.4,
+    factory: 0.4,
+    bolt: 0.4,
+    lovable: 0.38,
+    v0: 0.38,
+    same: 0.34,
+    manus: 0.34,
 
-    // Review / PR / repo agents
-    'codecov-ai',
-    'coderabbit',
-    'graphite-diamond',
-    'reviewpad',
-    'sourcery',
-    'sonar',
-    'sonarqube-ai',
-    'snyk',
-    'snyk-code',
-    'semgrep-assistant',
-    'deepcode',
-    'qodo',
-    'qodo-merge',
-    'qodo-gen',
-    'codium',
-    'codium-ai',
+    // Review / PR / repo assistants
+    coderabbit: 0.5,
+    qodo: 0.46,
+    sourcery: 0.38,
+    sonar: 0.38,
+    snyk: 0.36,
+    semgrep: 0.34,
+    codecov: 0.34,
+    graphite: 0.32,
+    reviewpad: 0.3,
+    greptile: 0.3,
+    ellipsis: 0.28,
+    dosu: 0.28,
+    codegen: 0.28,
+    potpie: 0.26,
+    entelligence: 0.24,
 
-    // Older / adjacent but still seen in repos or configs
-    'blackbox',
-    'askcodi',
-    'phind',
-    'sourcegraph',
-    'bito',
-    'codewhisperer',
-    'watsonx-code-assistant',
-    'intellicode',
-    'kite'
-  ];
-  const maxAgentLength = Math.max('agents'.length, ...codingAgents.map((name) => name.length));
+    // Older / adjacent / lower-confidence
+    codewhisperer: 0.36,
+    ghostwriter: 0.34,
+    watsonx: 0.3,
+    blackbox: 0.28,
+    askcodi: 0.26,
+    phind: 0.26,
+    sourcegraph: 0.24,
+    bito: 0.22,
+    mutable: 0.22,
+    cosine: 0.22,
+    fine: 0.22,
+    poolside: 0.22,
+    magic: 0.22,
+    bloop: 0.2,
+    intellicode: 0.18,
+    kite: 0.08,
+    deepcode: 0.08
+  };
+
+  const agentNames = Object.keys(codingAgentImportance);
+  const totalAgentWeight = agentNames.reduce((sum, name) => sum + codingAgentImportance[name], 0);
+
+  // Weighted random pick, avoiding an immediate repeat of `previous`.
+  function pickAgent(previous?: string): string {
+    for (let attempt = 0; attempt < 8; attempt += 1) {
+      let r = Math.random() * totalAgentWeight;
+      for (const name of agentNames) {
+        r -= codingAgentImportance[name];
+        if (r <= 0) {
+          if (name !== previous) {
+            return name;
+          }
+          break;
+        }
+      }
+    }
+    return agentNames[Math.floor(Math.random() * agentNames.length)];
+  }
 
   let animatedAgent = $state('agents');
-
   onMount(() => {
     let timer: ReturnType<typeof setTimeout> | undefined;
-    let currentAgent = 0;
-    let currentLength = 0;
-    let erasing = false;
-
-    animatedAgent = '';
+    // Open on the static "agents" word, hold it, then erase and type real agents.
+    let currentAgent = 'agents';
+    let currentLength = currentAgent.length;
+    let erasing = true;
 
     const nextStep = () => {
-      const agent = codingAgents[currentAgent];
+      const agent = currentAgent;
 
       if (erasing) {
         if (currentLength > 0) {
           currentLength -= 1;
           animatedAgent = agent.slice(0, currentLength);
-          timer = setTimeout(nextStep, 60);
+          // Backspacing is quick but still slightly uneven.
+          timer = setTimeout(nextStep, Math.floor(38 + Math.random() * 45));
           return;
         }
 
         erasing = false;
-        currentAgent = (currentAgent + 1) % codingAgents.length;
-        timer = setTimeout(nextStep, 360);
+        currentAgent = pickAgent(agent);
+        // Beat before starting the next word.
+        timer = setTimeout(nextStep, 560);
         return;
       }
 
       if (currentLength < agent.length) {
         currentLength += 1;
         animatedAgent = agent.slice(0, currentLength);
-        timer = setTimeout(nextStep, Math.floor(65 + Math.random() * 55));
+        // Per-keystroke jitter, with a rare, short "thinking" pause. Capped so
+        // the slow end never lingers long enough to look like the page hung.
+        const base = 60 + Math.random() * 110;
+        const hesitation = Math.random() < 0.08 ? 90 + Math.random() * 70 : 0;
+        timer = setTimeout(nextStep, Math.floor(base + hesitation));
         return;
       }
 
       erasing = true;
-      timer = setTimeout(nextStep, 950);
+      // Linger on the finished name so it reads, not flickers.
+      timer = setTimeout(nextStep, 2300);
     };
 
-    nextStep();
+    // Hold "agents" for ~1.6s before the first erase kicks off the cycle.
+    timer = setTimeout(nextStep, 1600);
 
     return () => {
       if (timer) {
@@ -313,8 +318,10 @@
     <div class="container hero-inner">
       <span class="eyebrow">Code intelligence for AI coding agents</span>
       <h1 class="hero-title">
-        Stop letting <span class="hero-agent" style={`--agent-width:${maxAgentLength}ch`}
-          >{animatedAgent}</span
+        Stop letting <span
+          class="hero-agent"
+          title="your coding agent of choice"
+          aria-label="your coding agent of choice">{animatedAgent}</span
         ><br />
         <span class="gradient-text">guess from grep.</span>
       </h1>
@@ -694,9 +701,9 @@
     font-weight: 800;
   }
   .hero-agent {
+    /* Sized to its content so the centered headline recenters as names type. */
     display: inline-block;
-    min-width: var(--agent-width, 8ch);
-    text-align: left;
+    white-space: nowrap;
   }
   .hero-agent::after {
     content: '_';
