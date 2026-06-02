@@ -28,3 +28,6 @@ vite.config.ts.timestamp-*
 # Task
 .task/
 
+# Playwrith
+.playwright-mcp/
+

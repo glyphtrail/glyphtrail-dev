@@ -330,6 +330,7 @@
     <nav class="nav-links">
       <a href="#features">Features</a>
       <a href="#how">How it works</a>
+      <a href="#explore">Explore</a>
       <a href="#cli">CLI</a>
       <a href="#mcp">MCP</a>
     </nav>
@@ -502,6 +503,48 @@
     </div>
   </section>
 
+  <!-- ===================== EXPLORE ===================== -->
+  <section id="explore" class="section">
+    <div class="container">
+      <div class="section-head" use:reveal>
+        <span class="eyebrow">Visual exploration</span>
+        <h2>See the shape of your codebase</h2>
+        <p class="section-lead">
+          The same graph that powers queries and impact analysis renders as a map you can explore:
+          every symbol a node, every call and dependency an edge. Zoom out for the architecture,
+          zoom in to the blast radius of a single change.
+        </p>
+      </div>
+
+      <figure class="graph-viz" use:reveal={120}>
+        <div class="graph-frame">
+          <div class="term-bar">
+            <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+            <span class="term-title">glyphtrail · graph view</span>
+          </div>
+          <picture>
+            <source srcset="/vis.webp" type="image/webp" />
+            <source srcset="/vis.jpg" type="image/jpeg" />
+            <img
+              class="graph-img"
+              src="/vis.png"
+              width="1100"
+              height="638"
+              alt="glyphtrail graph visualization of a codebase: hundreds of symbol nodes - functions, methods, structs, classes and traits - connected by call graph and dependency edges, with node size scaled by connectivity."
+              loading="lazy"
+              decoding="async"
+            />
+          </picture>
+        </div>
+        <figcaption class="graph-legend">
+          <span><i class="lg-node"></i>Nodes are symbols</span>
+          <span><i class="lg-edge"></i>Edges are calls &amp; dependencies</span>
+          <span><i class="lg-size"></i>Size reflects connectivity</span>
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
   <!-- ===================== CLI ===================== -->
   <section id="cli" class="section">
     <div class="container cli-grid">
@@ -604,6 +647,7 @@
     <nav class="footer-links">
       <a href="#features">Features</a>
       <a href="#how">How it works</a>
+      <a href="#explore">Explore</a>
       <a href="#cli">CLI</a>
       <a href="#mcp">MCP</a>
       <a href={GITHUB} target="_blank" rel="me noopener">GitHub</a>
@@ -1066,6 +1110,66 @@
     color: #fbbf6e;
   }
 
+  /* ---------- explore / graph viz ---------- */
+  .graph-viz {
+    margin: 0;
+  }
+  .graph-frame {
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: #070a11;
+    box-shadow: 0 30px 70px -30px rgba(0, 0, 0, 0.8);
+    transition: border-color 0.2s ease;
+  }
+  .graph-frame:hover {
+    border-color: rgba(255, 255, 255, 0.28);
+  }
+  .graph-img {
+    display: block;
+    width: 100%;
+    height: auto;
+    /* Match the artwork backdrop while it decodes / before lazy-load. */
+    background: #0a0e1a;
+  }
+  .graph-legend {
+    margin-top: 18px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px 26px;
+    color: var(--faint);
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+  }
+  .graph-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .graph-legend i {
+    flex: none;
+  }
+  .lg-node,
+  .lg-size {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+  .lg-node {
+    background: #a5b4ff;
+    box-shadow: 0 0 8px rgba(165, 180, 255, 0.7);
+  }
+  .lg-size {
+    background: var(--cyan);
+    box-shadow: 0 0 8px var(--cyan);
+  }
+  .lg-edge {
+    width: 16px;
+    height: 0;
+    border-top: 2px solid rgba(99, 110, 200, 0.9);
+  }
+
   /* ---------- mcp tools ---------- */
   .tools {
     display: grid;
@@ -1201,6 +1305,7 @@
   :global(.js .tool),
   :global(.js .compare),
   :global(.js .terminal),
+  :global(.js .graph-viz),
   :global(.js .cta) {
     opacity: 0;
     transform: translateY(18px);
@@ -1261,6 +1366,7 @@
     :global(.js .tool),
     :global(.js .compare),
     :global(.js .terminal),
+    :global(.js .graph-viz),
     :global(.js .cta) {
       opacity: 1;
       transform: none;
