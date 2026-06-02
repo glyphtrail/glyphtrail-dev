@@ -212,51 +212,79 @@
     return agentNames[Math.floor(Math.random() * agentNames.length)];
   }
 
-  let animatedAgent = $state('agents');
+  const IDLE_WORD = 'agents';
+
+  // How long the headline rests on "agents" between cycles. The very first
+  // rest is shorter so the animation gets going sooner.
+  const FIRST_REST_MS = 5000;
+  const REST_MS = 6500;
+  // Number of real agent names shown per cycle before settling on "agents".
+  const AGENTS_PER_CYCLE = 3;
+
+  let animatedAgent = $state(IDLE_WORD);
+  // The blinking caret is shown for the whole JS-driven animation (including
+  // the "agents" rest), but never without JS.
+  let showCaret = $state(false);
+  // Real agent names take the caret's muted colour; the "agents" word keeps the
+  // standard white so it reads as part of the "Stop letting agents" headline.
+  let highlightAgent = $state(false);
+
   onMount(() => {
     let timer: ReturnType<typeof setTimeout> | undefined;
-    // Open on the static "agents" word, hold it, then erase and type real agents.
-    let currentAgent = 'agents';
-    let currentLength = currentAgent.length;
-    let erasing = true;
-
-    const nextStep = () => {
-      const agent = currentAgent;
-
-      if (erasing) {
-        if (currentLength > 0) {
-          currentLength -= 1;
-          animatedAgent = agent.slice(0, currentLength);
-          // Backspacing is quick but still slightly uneven.
-          timer = setTimeout(nextStep, Math.floor(38 + Math.random() * 45));
-          return;
-        }
-
-        erasing = false;
-        currentAgent = pickAgent(agent);
-        // Beat before starting the next word.
-        timer = setTimeout(nextStep, 560);
-        return;
-      }
-
-      if (currentLength < agent.length) {
-        currentLength += 1;
-        animatedAgent = agent.slice(0, currentLength);
-        // Per-keystroke jitter, with a rare, short "thinking" pause. Capped so
-        // the slow end never lingers long enough to look like the page hung.
-        const base = 60 + Math.random() * 110;
-        const hesitation = Math.random() < 0.08 ? 90 + Math.random() * 70 : 0;
-        timer = setTimeout(nextStep, Math.floor(base + hesitation));
-        return;
-      }
-
-      erasing = true;
-      // Linger on the finished name so it reads, not flickers.
-      timer = setTimeout(nextStep, 2300);
+    const after = (fn: () => void, ms: number) => {
+      timer = setTimeout(fn, ms);
     };
 
-    // Hold "agents" for ~1.6s before the first erase kicks off the cycle.
-    timer = setTimeout(nextStep, 1600);
+    const eraseDelay = () => Math.floor(38 + Math.random() * 45);
+    const typeDelay = () => {
+      const base = 60 + Math.random() * 110;
+      const hesitation = Math.random() < 0.08 ? 90 + Math.random() * 70 : 0;
+      return Math.floor(base + hesitation);
+    };
+
+    // Char-level primitives. Both assume `animatedAgent` is a prefix of the
+    // target, which holds because every word is erased to '' before the next.
+    const eraseAll = (done: () => void) => {
+      if (animatedAgent.length === 0) {
+        done();
+        return;
+      }
+      animatedAgent = animatedAgent.slice(0, -1);
+      after(() => eraseAll(done), eraseDelay());
+    };
+    const typeWord = (word: string, done: () => void) => {
+      if (animatedAgent.length >= word.length) {
+        done();
+        return;
+      }
+      animatedAgent = word.slice(0, animatedAgent.length + 1);
+      after(() => typeWord(word, done), typeDelay());
+    };
+
+    // Erase/type/erase through random agents for ~5s, then settle back to
+    // "agents" and rest there before looping.
+    const startCycle = () => {
+      eraseAll(() => cycleWord(IDLE_WORD, 0));
+    };
+    const cycleWord = (previous: string, shown: number) => {
+      // After naming AGENTS_PER_CYCLE agents, type back to "agents" (white) and rest.
+      if (shown >= AGENTS_PER_CYCLE) {
+        highlightAgent = false;
+        typeWord(IDLE_WORD, () => after(startCycle, REST_MS));
+        return;
+      }
+      const next = pickAgent(previous);
+      highlightAgent = true;
+      typeWord(next, () => {
+        // Linger on the finished name so it reads, then erase and continue.
+        after(() => eraseAll(() => cycleWord(next, shown + 1)), 2300);
+      });
+    };
+
+    // Open on "agents" with the caret, then start cycling after the first rest.
+    animatedAgent = IDLE_WORD;
+    showCaret = true;
+    after(startCycle, FIRST_REST_MS);
 
     return () => {
       if (timer) {
@@ -327,6 +355,8 @@
       <h1 class="hero-title">
         Stop letting <span
           class="hero-agent"
+          class:is-caret={showCaret}
+          class:is-name={highlightAgent}
           title="your coding agent of choice"
           aria-label="your coding agent of choice">{animatedAgent}</span
         ><br />
@@ -712,7 +742,11 @@
     display: inline-block;
     white-space: nowrap;
   }
-  .hero-agent::after {
+  .hero-agent.is-name {
+    /* Real agent names share the caret's muted colour. */
+    color: var(--faint);
+  }
+  .hero-agent.is-caret::after {
     content: '_';
     margin-left: 0.08em;
     color: var(--faint);
