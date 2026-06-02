@@ -43,7 +43,7 @@
     },
     {
       title: 'Query in Cypher',
-      body: 'Structural code search over a native graph database. Find definitions, callers, callees, neighbours and semantic relationships with graph traversal.',
+      body: 'Structural code search over a native graph database. Find definitions, callers, callees, neighbors and semantic relationships with graph traversal.',
       icon: 'search'
     },
     {
